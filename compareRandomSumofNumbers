@@ -1,0 +1,76 @@
+Include Irvine32.inc
+; Write a program with a loop that iterates 5 times. 
+ ; Generate two random numbers from 0 to 100
+ ; Request the sum
+ ; i.e: "What is 42 + 35 "
+; Tell the user if their response is right
+; Use waitmsg
+
+.data
+	whatIs BYTE "What is ", 0
+	plusSymbol BYTE " + ", 0
+	questionMark BYTE "? ", 0
+	correct BYTE "Correct!", 0
+	incorrect BYTE "Incorrect :(", 0
+	firstValue DWORD ?
+	secondValue DWORD ?
+	correctSum DWORD ?
+
+.code
+main PROC
+	mov ecx, 5
+	Call Randomize
+L1:
+	mov eax, 101
+	call RandomRange
+	mov firstValue, eax
+
+	mov eax, 101
+	call RandomRange
+	mov secondValue, eax
+
+	mov eax, firstValue
+	add eax, secondValue
+	mov correctSum, eax
+
+	mov edx, OFFSET whatIs
+	call WriteString
+
+	mov eax, firstValue
+	call WriteDec
+
+	mov edx, OFFSET plusSymbol
+	call WriteString
+
+	mov eax, secondValue
+	call WriteDec
+
+	mov edx, OFFSET questionMark
+	call WriteString
+	
+	call ReadInt
+
+	mov ebx, correctSum
+	cmp eax, ebx
+	je CorrectAnswer
+
+	mov edx, OFFSET incorrect
+	call WriteString
+	call crlf
+	JMP ContinueLoop
+
+CorrectAnswer:
+	mov edx, OFFSET correct
+	call WriteString
+	call crlf
+
+ContinueLoop:
+	call WaitMsg
+	call crlf
+
+	dec ecx
+	jne L1
+
+	exit
+main ENDP
+END main
