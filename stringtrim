@@ -1,0 +1,49 @@
+Include Irvine32.inc
+
+.data
+  destinationStr 30 dup(0)
+  sourceStr BYTE "Hello World!", 0
+ 
+.code
+  main PROC
+    push offset destinaionStr
+    push offset sourceStr
+    push 5
+    
+    ; we are pushing 3 dword 
+  
+    call stringTrim
+
+  exit
+
+  main ENDP
+
+stringTrim PROC
+  push ebp
+  mov ebp, esp
+
+  cld ; clears destination flag, if its set, we move backwards, if it isnt we move forwards
+  ; as its told, we dont do anything with the flags
+
+  mov ecx, [ebp + 8] ; num characters
+  mov esi, [ebp + 12] ; offset of source
+  mov edi, [ebp + 16] ; offset of destination
+
+  rep movsb ; ecx = 5, esi = what are we grabbing characters from, edi = where are we putting them. rep always automatically  
+
+  mov edx, offset destinationStr
+  call WriteString
+
+stringTrim ENDP
+
+END main
+
+; "Hello World" - 5 - > "Hello"
+; movsb and copsb ; rep
+
+
+; dest of [16]
+; source of [12]
+; 5 -> last is always closest [8]
+; ra 
+; ebp
