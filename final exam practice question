@@ -1,0 +1,74 @@
+Include Irvine32.inc
+
+; a) create structures before data segment
+car STRUCT
+  make BYTE 15 DUP(?)
+  model BYTE 15 DUP(?)
+  mileage WORD ?
+  rentalHistory DWORD 50 DUP(?)
+  numRentals BYTE 0
+car ENDS
+; a) end
+
+.data
+  ; c) 
+  AllCars car 5 DUP(<,,0>) ; creates 5 empty car variables
+                           ; you can put two commas to SKIP parameters, so here we are skipping make & model, but putting something for mileage (0).
+  ; c) end
+
+  ; b)
+  myCar car <> ; angle brackets create empty car variable
+
+.code
+  main PROC
+    mov myCar.rentalHistory[0], 12052024 ; 12/05/2024
+    inc myCar.numRentals
+    ; b) end
+
+    mov AllCars[0].rentalHistory[0], 12052024 
+    mov AllCars[0].rentalHistory[4], 12032024 ; IMPORTANT! when accessing values of a car array's rentalhistory, inc by four because it is a double word variable
+    mov AllCars[0].rentalHistory[8], 12022024
+    add AllCars[0].numRentals, 3
+
+    mov AllCars[1 * TYPEOF Car].rentalHistory[0], 12062024
+    mov AllCars[1 * TYPEOF Car].rentalHistory[4], 12072024
+    add AllCars[1* TYPEOF Car].numRentals, 2
+
+    push offset AllCars[0]
+    call printRentalHistory
+
+    call crlf
+
+    push offset AllCars[1 * TYPEOF Car]
+    call printRentalHistory
+
+  exit
+
+  main ENDP
+
+; c)
+printRentalHistory PROC
+  push ebp
+  mov ebp, esp
+
+  mov esi, [ebp + 8] ; Car's offset
+  ; mov ecx, [esi].numRentals .. OK THIS DOESNT WORK, WE NEED A PTR BECAUSE IT ECX DOESNT KNOW WHAT ITS POINTING TO. 
+  ; we have to say, hey you're not just pointing at a memory location, what ur point at just happens to be a car.
+  ; therefore...
+  movzx ecx, (Car PTR [esi]).numRentals ;zx because byte -> dword
+  mov edi, 0
+
+L1:
+  mov eax, (Car PTR [esi]).rentalHistory[edi] ; we're telling the assembler that esi is pointing to a car, then accessing rental history, then access whatever is at edi
+  add edi, 4 ; bc rentalhistory is an array of dword, we have to do +4 to properly get the next value
+  call WriteDec
+  call Crlf
+  loop L1
+
+  pop ebp
+  ret 4 ; pop 4 off stack because we push ONE dword value onto stack. cant put bytes onto stack   for ... whatever reason
+
+printRentalHistory ENDP
+
+
+END main
