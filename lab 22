@@ -1,0 +1,74 @@
+A.
+• Create a macro named mFindLarger which takes two parameters and moves the larger of
+the two into EAX to return it. Assume that both parameters will be doublewords. Make
+sure to allow either or both parameters to be immediates and to preserve any changed
+registers.
+• Create a macro named mGetNum which receives a string prompt as a parameter. This
+macro should print the prompt and then retrieve an integer from the user and place it in
+EAX.
+• Create a macro named mPrintRegisters which prints the values in the registers EAX –
+EDX by first printing their label and then the hex value in that register. Recall that the
+Irvine32 library has a WriteHex procedure. An example output:
+EAX: 000045AC
+EBX: 00448AC0
+ECX: 00AC8042
+EDX: 00BCDAF
+
+; helper function
+mWriteString MACRO text
+	LOCAL string
+	.data	
+		string BYTE text, 0
+	.code
+		mov edx, offset string
+		call WriteString
+	ENDM
+
+mFindLarger MACRO value1 value2
+	push ebx
+	push ecx
+	mov ebx, value1
+	mov ecx, value2
+	cmp ebx, ecx
+	jg movFirst ; if ebx > ecx -> eax = ebx
+	mov eax, ecx ; else statement assumes != -> eax > ecx
+	Call WriteInt
+	jmp end
+	movFirst:
+		mov eax, ebx
+		Call WriteInt
+end:
+	pop ecx
+	pop ebx
+	ENDM
+
+mGetNum MACRO string 
+	push edx
+	mov edx, string
+	Call WriteString
+	Call ReadInt
+	Call WriteInt
+	pop edx
+ENDM
+
+mPrintRegisters MACRO eax ebx ecx edx
+	mWriteString "EAX: "
+	mov eax, eax
+	call WriteHex
+	call crlf
+
+	mWriteString "EBX: "
+	mov eax, ebx
+	call WriteHex
+	call crlf
+	
+	mWriteString "ECX: "
+	mov eax, ecx
+	call WriteHex
+	call crlf
+	
+	mWriteString "EDX: "
+	mov eax, edx
+	call WriteHex
+	call crlf
+ENDM
