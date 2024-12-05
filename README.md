@@ -1,1 +1,1 @@
-### csci 150 @ mt.sac ; assembly and machine architecture
+### csci 150 @ mt.sac ; assembly language and machine architecture
