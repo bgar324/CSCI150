@@ -1,49 +1,48 @@
-Include Irvine32.inc
+INCLUDE Irvine32.inc
+
+COMMENT @
+	Write a procedure named stringTrim which takes the offsets of two strings and an integer in a stack frame. The integer
+	represents the number of characters to copy from the first string to the second string. You may assume the second string has at least
+	as many indexes as the integer passed and the first string has more indexes than the integer passed. Your procedure should use one
+	of the string primitive operations to accomplish this.
+@
 
 .data
-  destinationStr 30 dup(0)
-  sourceStr BYTE "Hello World!", 0
- 
+	destinationString BYTE 30 DUP(?)
+	stringOne BYTE "Benjamin", 0
+
 .code
-  main PROC
-    push offset destinaionStr
-    push offset sourceStr
-    push 5
-    
-    ; we are pushing 3 dword 
-  
-    call stringTrim
+main PROC
 
-  exit
+	push OFFSET destinationString
+	push OFFSET stringOne
+	push 5
+	Call stringTrim
 
-  main ENDP
+exit
+main ENDP
 
 stringTrim PROC
-  push ebp
-  mov ebp, esp
+	push ebp
+	mov ebp, esp
 
-  cld ; clears destination flag, if its set, we move backwards, if it isnt we move forwards
-  ; as its told, we dont do anything with the flags
+	mov ecx, [ebp + 8]
+	mov esi, [ebp + 12] 
+	mov edi, [ebp + 16]
+	rep movsb
 
-  mov ecx, [ebp + 8] ; num characters
-  mov esi, [ebp + 12] ; offset of source
-  mov edi, [ebp + 16] ; offset of destination
+	mov BYTE PTR [edi], 0 ; null termination
 
-  rep movsb ; ecx = 5, esi = what are we grabbing characters from, edi = where are we putting them. rep always automatically  
+	mov edx, [ebp + 16]
+	call crlf
+	call WriteString
+	call WaitMsg
 
-  mov edx, offset destinationStr
-  call WriteString
+	pop ebp
+	ret 12
 
 stringTrim ENDP
 
 END main
 
-; "Hello World" - 5 - > "Hello"
-; movsb and copsb ; rep
-
-
-; dest of [16]
-; source of [12]
-; 5 -> last is always closest [8]
-; ra 
-; ebp
+; its important to note that mov edx, edi does not work while mov edx, [ebp+16] does because edi constantly changes to reflect the next insertion of characters. while the pointer doesnt.
