@@ -1,52 +1,76 @@
-Include Irvine32.inc
+INCLUDE Irvine32.inc
+
+COMMENT @
+	Write a procedure named stringCompare which takes which takes four parameters in a stack frame: the first two are offsets to
+	strings and the second two are their lengths. This procedure should determine which string comes first alphabetically. You may
+	assume both strings passed will be all lowercase. Return 0 if the first string passed comes first alphabetically and 1 otherwise. Hint:
+	compare both strings one character at a time until one contains a character that does not match the other. Simply return 0 if the
+	strings are equal
+@
 
 .data
-  str1 BYTE "ABCDE", 0
-  str2 BYTE "ABDCE", 0
+	stringOne BYTE "ABCDEG", 0
+	stringTwo BYTE "ABCDEF", 0
+
 .code
-  main PROC
-    push str1
-    push str2
-    push 5
+main PROC
+	push OFFSET stringOne
+	push OFFSET stringTwo
+	push LENGTHOF stringOne - 1
+	push LENGTHOF stringTwo - 1
+	Call stringCompare
 
-    call stringCompare
+exit
+main ENDP
 
-  exit
-
-  main ENDP
+COMMENT @
+	stack frame
+	stringone           [20]
+	stringtwo           [16]
+	length of stringone [12]
+	length of stringtwo [8]
+	return address
+	ebp
+@
 
 stringCompare PROC
-  push ebp
-  mov ebp, esp
-  mov ecx, [ebp + 8]
-  mov esi, [ebp + 12]
-  mov edi, [ebp + 16]
+	push ebp
+	mov ebp, esp
+	mov ecx, [ebp + 8]
+	mov esi, [ebp + 20] ; source
+	mov edi, [ebp + 16] ; destination
 
 L1:
-  mov al, [esi]
-  cmp al, [edi]
+	mov al, [esi] ; dereference esi to point to first letter
+	cmp al, [edi] ; checks equality
 
-  jl ReturnZero
-  jg ReturnOne
+	jl ReturnZero
+	jg ReturnOne
 
-  loop L1
+	inc esi
+	inc edi
+	loop L1
 
 jmp returnZero
 
 ReturnOne:
   mov eax, 1
-  Call WriteDec
+  Call WriteDec         ; Print result
+    call crlf
   jmp handleQuit
 
 ReturnZero:
   mov eax, 0
-  Call WriteDec
+  Call WriteDec         ; Print result
+    call crlf
   jmp handleQuit
 
 handleQuit:
-  ret 12
+  call WaitMsg
+
+  pop ebp
+  ret 12                ; Clean up stack (3 arguments * 4 bytes each)
 
 stringCompare ENDP
 
 END main
-
