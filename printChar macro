@@ -1,0 +1,25 @@
+INCLUDE Irvine32.inc
+
+; Write a macro named printChar which takes two required parameters: a character and a number. The number indicates how many times the character should be printed to the screen.
+
+mprintChar MACRO character, number
+    mov ecx, number
+    mov al, character
+L1:
+    Call WriteChar
+    call crlf
+    loop L1
+ENDM
+
+.data
+
+.code
+main PROC
+    mprintChar 'b', 30
+
+    call WaitMsg
+
+    exit
+main ENDP
+
+END main
