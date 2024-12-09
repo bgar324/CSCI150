@@ -1,0 +1,41 @@
+INCLUDE Irvine32.inc
+
+; Write a macro named getPositiveInt which asks the user to enter a positive integer. If the value they enter is not positive, tell
+; them it is invalid and ask again. Once the entered value is positive, return it in EAX. The strings that print should be local variables
+; of this macro.
+
+mgetPositiveInt MACRO
+	LOCAL prompt, error
+	.data
+		prompt BYTE "Enter a positive number: ", 0
+		error BYTE "Not positive.", 0
+	.code
+	L1:
+		mov edx, OFFSET prompt
+		Call WriteString
+		Call ReadInt
+		cmp eax, 0
+		jl handleError
+		Call WriteDec
+		call crlf
+		Call WaitMsg
+		exit
+	handleError:
+		mov edx, OFFSET error
+		Call WriteString
+		call crlf
+		jmp L1
+ENDM
+
+
+.data
+
+.code
+main PROC
+
+	mgetPositiveInt
+
+exit
+main ENDP
+
+END main
